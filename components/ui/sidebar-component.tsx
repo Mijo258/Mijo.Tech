@@ -551,8 +551,10 @@ function IconNavigation({
         </div>
       </div>
 
-      {/* Navigation Icons */}
-      <div className="flex flex-col gap-2 w-full items-center">
+      {/* Navigation Icons — flex-1/min-h-0 lets the icons scroll on very
+          short screens (e.g. a phone in landscape) instead of clipping the
+          bottom items. */}
+      <div className="flex flex-col gap-2 w-full items-center flex-1 min-h-0 overflow-y-auto">
         <Link
           href="/"
           aria-label="Go to home"
@@ -573,8 +575,6 @@ function IconNavigation({
           </IconNavButton>
         ))}
       </div>
-
-      <div className="flex-1" />
 
       {/* Bottom section */}
       <div className="flex flex-col gap-2 w-full items-center">
@@ -656,7 +656,7 @@ function DetailSidebar({
   const showProjects = !q || "projects".includes(q);
 
   return (
-    <aside className="bg-black flex flex-col gap-4 items-start p-4 h-svh w-80 border-r border-neutral-800">
+    <aside className="bg-black flex flex-col gap-4 items-start p-4 h-svh w-full border-r border-neutral-800">
       <BrandBadge />
       <SectionTitle title={content.title} />
       <SearchContainer isCollapsed={false} onSearchChange={setQuery} />
@@ -906,6 +906,18 @@ export function Frame760() {
       {/* Icon rail — always visible at the left edge */}
       <IconNavigation activeSection={activeSection} onSectionChange={setActiveSection} />
 
+      {/* Mobile backdrop — dims and blocks the content while the drawer is
+          open, and closes it on tap. Hidden on md+ where the panel sits in
+          the page flow instead of overlaying it. */}
+      {panelOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          onClick={() => setPanelOpen(false)}
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm md:hidden"
+        />
+      )}
+
       {/* Pull handle — grab the arrow to reveal the panel (also the touch path) */}
       <button
         type="button"
@@ -916,12 +928,14 @@ export function Frame760() {
         <ChevronDownIcon size={16} className={`transition-transform duration-300 ${panelOpen ? "rotate-90" : "-rotate-90"}`} />
       </button>
 
-      {/* Wide menu panel — part of the page flow, so the content shifts to sit
-          beside it instead of being covered. Its width animates 0 → 20rem; the
-          inner panel stays 20rem wide and overflow-hidden reveals it as it grows. */}
+      {/* Wide menu panel. On md+ it sits in the page flow, so the content
+          shifts to sit beside it instead of being covered. Its width animates
+          0 → 20rem; the inner panel tracks that width and overflow-hidden
+          reveals it as it grows. Below md it becomes a fixed overlay so it
+          slides over the content instead of crushing it on a small screen. */}
       <div
         inert={!panelOpen}
-        className="h-svh overflow-hidden transition-[width] duration-500"
+        className="fixed inset-y-0 left-16 z-40 h-svh max-w-[calc(100vw_-_4rem)] overflow-hidden transition-[width] duration-500 md:relative md:inset-auto md:left-auto md:z-auto md:max-w-none"
         style={{
           width: panelOpen ? "20rem" : "0rem",
           transitionTimingFunction: softSpringEasing,

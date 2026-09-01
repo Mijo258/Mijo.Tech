@@ -41,7 +41,7 @@ function ProjectBack({ project }: { project: ProjectData }) {
   return (
     <div className="flex h-full w-full flex-col p-6">
       <h3 className="font-[family-name:var(--font-lexend)] text-xl font-semibold text-neutral-50">
-        About {project.title}
+        {project.backTitle ?? `About ${project.title}`}
       </h3>
 
       {/* Scrollable text area — the long-form story goes here */}
@@ -56,6 +56,7 @@ function ProjectBack({ project }: { project: ProjectData }) {
           href={project.link}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
           className="mt-5 inline-flex h-10 shrink-0 items-center justify-center rounded-md bg-foreground px-5 text-[14px] font-medium text-background transition-opacity hover:opacity-90"
         >
           {project.buttonText}
@@ -63,6 +64,7 @@ function ProjectBack({ project }: { project: ProjectData }) {
       ) : (
         <button
           type="button"
+          onClick={(e) => e.stopPropagation()}
           className="mt-5 h-10 shrink-0 rounded-md bg-foreground px-5 text-[14px] font-medium text-background"
         >
           {project.buttonText}

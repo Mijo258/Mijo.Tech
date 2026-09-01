@@ -17,6 +17,8 @@ export interface ProjectData {
   frontText: string;
   backText: string;
   buttonText: string;
+  /** Optional heading for the back face of the card; falls back to "About <title>". */
+  backTitle?: string;
   /** Optional link opened by the card's back-face button. */
   link?: string;
 }
@@ -37,14 +39,16 @@ export const projects: Record<ProjectId, ProjectData> = {
   },
   "habit-tracker": {
     id: "habit-tracker",
-    title: "Habit Tracker",
-    tagline: "Build better routines, one day at a time",
-    imageSrc: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop",
-    imageAlt: "A planner and pen laid out on a desk",
+    title: "Momentum",
+    tagline: "Build momentum, one day at a time",
+    imageSrc: "/image_2026-09-01_18-07-43.jpg",
+    imageAlt: "Habit Tracker project cover",
     frontText:
-      "Habit Tracker is the project placeholder. This is the introduction that appears on the front of the card — the first few lines that tell a visitor what Habit Tracker is, at a glance.\n\nWrite the real story here in the next step. There is plenty of room: the text area scrolls, so long paragraphs are fine.",
+      "Consistency isn't built through rigid discipline; it is built through visual reward.\n\nMost habit trackers feel like sterile spreadsheets or punishing checklists. This application was engineered to be different—a living, breathing dashboard that reacts to your progress in real-time.\n\nBy combining complex scheduling algorithms with a dynamic, neon-lit interface, it transforms daily routines into a highly visual, satisfying streak. Discover a tool where your calendar doesn't just track your days—it celebrates them.",
+    backTitle: "Under the Hood",
     backText:
-      "This is the detailed back-of-card write-up for Habit Tracker.\n\nUse this space for the full project story: what Habit Tracker does, why it exists, how it was built, the people behind it, and what comes next.\n\nThe card flips on hover, so the front gives the pitch and the back gives the depth.",
+      "This Habit Tracker is a masterclass in front-end state management and dynamic UI architecture.\n\nAt its core is a Custom Scheduling Engine capable of calculating complex repeating intervals, backfilling missed days, and maintaining flawless streak logic—all persisted securely in the browser using Zustand.\n\nThe UI features a Living Background that smoothly crossfades its color palette (Green, Amber, Red) based on your real-time daily completion status. Users can dive into glassy, \"page-on-page\" detail sheets to view 12-week heatmaps, generate shareable PNG progress cards, and export their entire database as JSON.\n\nBuilt with Next.js, TypeScript, Tailwind CSS, and Framer Motion, it delivers a premium, app-like experience directly in the browser.",
     buttonText: "View project",
+    link: "https://habittracker-six-sand.vercel.app/",
   },
 };

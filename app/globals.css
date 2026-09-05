@@ -117,4 +117,84 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* The top-nav buttons link to page sections; make those jumps glide
+     instead of snapping, and honour users who disable motion. */
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Polished-gold text (the hero surname).                                    */
+/*  Reads like freshly polished metal: a static metallic sheen with a specular */
+/*  band, plus a soft glint that sweeps across the letters every few seconds   */
+/*  and settles. Without background-clip support it falls back to plain gold.  */
+/* -------------------------------------------------------------------------- */
+.text-gold-shine {
+  color: #ffb300;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .text-gold-shine {
+    color: transparent;
+    /* Top layer: the sweeping glint. Bottom layer: the metallic gold sheen. */
+    background-image:
+      linear-gradient(
+        115deg,
+        transparent 45%,
+        rgba(255, 255, 255, 0.95) 50%,
+        transparent 55%,
+        transparent 100%
+      ),
+      linear-gradient(
+        180deg,
+        #e8a000 0%,
+        #ffc22e 35%,
+        #ffedb0 46%,
+        #ffb300 60%,
+        #9a6400 100%
+      );
+    background-repeat: no-repeat;
+    background-size:
+      320% 100%,
+      100% 100%;
+    background-position:
+      0% 0,
+      0 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: gold-shine-sweep 6.5s ease-in-out infinite;
+  }
+}
+
+@keyframes gold-shine-sweep {
+  /* Glint parks off the right edge, then sweeps left to right across the
+     letters and settles off the left edge before the next pass. */
+  0%,
+  45% {
+    background-position:
+      0% 0,
+      0 0;
+  }
+  78% {
+    background-position:
+      100% 0,
+      0 0;
+  }
+  100% {
+    background-position:
+      100% 0,
+      0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-gold-shine {
+    animation: none;
+  }
 }

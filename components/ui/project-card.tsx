@@ -51,25 +51,29 @@ function ProjectBack({ project }: { project: ProjectData }) {
         </p>
       </div>
 
-      {project.link ? (
-        <a
-          href={project.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="mt-5 inline-flex h-10 shrink-0 items-center justify-center rounded-md bg-foreground px-5 text-[14px] font-medium text-background transition-opacity hover:opacity-90"
-        >
-          {project.buttonText}
-        </a>
-      ) : (
-        <button
-          type="button"
-          onClick={(e) => e.stopPropagation()}
-          className="mt-5 h-10 shrink-0 rounded-md bg-foreground px-5 text-[14px] font-medium text-background"
-        >
-          {project.buttonText}
-        </button>
-      )}
+      {/* Action sits bottom-right, leaving the bottom-left corner clear for
+          the card's flip control. */}
+      <div className="mt-5 flex shrink-0 justify-end">
+        {project.link ? (
+          <a
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex h-10 items-center justify-center rounded-md bg-foreground px-5 text-[14px] font-medium text-background transition-opacity hover:opacity-90"
+          >
+            {project.buttonText}
+          </a>
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => e.stopPropagation()}
+            className="h-10 shrink-0 rounded-md bg-foreground px-5 text-[14px] font-medium text-background"
+          >
+            {project.buttonText}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,20 +1,9 @@
 import type { Metadata } from "next";
-import { Alex_Brush, Lexend } from "next/font/google";
-import Frame760 from "@/components/ui/sidebar-component";
+import { Lexend } from "next/font/google";
 import "./globals.css";
 
-// Calligraphy face for the Mijo.tech wordmark — flowing, ink-style script with
-// connected letters. Loaded through next/font so it is self-hosted, preloaded
-// and swaps in without layout shift.
-const alexBrush = Alex_Brush({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-alex-brush",
-  display: "swap",
-});
-
-// UI face for the sidebar navigation — clean, geometric sans that pairs with
-// the script wordmark and keeps menu labels legible at small sizes.
+// UI face for the site — clean, geometric sans that stays legible for section
+// text and the top navigation.
 const lexend = Lexend({
   subsets: ["latin"],
   variable: "--font-lexend",
@@ -33,12 +22,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full bg-black">
-      <body className={`${alexBrush.variable} ${lexend.variable} h-full bg-black antialiased`}>
-        <div className="flex h-svh w-full overflow-hidden">
-          <Frame760 />
-          <main className="h-svh min-w-0 flex-1 overflow-y-auto">{children}</main>
-        </div>
+    <html lang="en" className="bg-black">
+      <body className={`${lexend.variable} min-h-svh bg-black text-neutral-50 antialiased`}>
+        <main>{children}</main>
       </body>
     </html>
   );

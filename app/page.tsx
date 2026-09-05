@@ -1,5 +1,5 @@
-import OrbitalHeroSectionDemo from "@/components/orbital-hero-section-demo";
+import PortfolioHome from "@/components/portfolio-home";
 
 export default function Home() {
-  return <OrbitalHeroSectionDemo />;
+  return <PortfolioHome />;
 }

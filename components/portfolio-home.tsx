@@ -30,6 +30,10 @@ const NAV_LINKS = [
   { href: "#contact", label: "Contact" },
 ] as const;
 
+/** Shown when the top-left profile photo is pressed. */
+const MIJO_GREETING =
+  "Hi, I'm Mohamed, You can call me Mijo, Feel free to read more about me below!.";
+
 /** The roles under the hero name — each shows in amber-gold, then cycles. */
 const ROLES = [
   "Full-stack Developer",
@@ -96,22 +100,72 @@ function BackgroundCanvas() {
 /* -------------------------------------------------------------------------- */
 
 function TopNav() {
+  const [greetingOpen, setGreetingOpen] = useState(false);
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-md">
-      <nav
-        aria-label="Sections"
-        className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-center gap-x-1.5 gap-y-1.5 px-4 py-3"
-      >
-        {NAV_LINKS.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            className="rounded-full border border-transparent px-3 py-1.5 font-[family-name:var(--font-lexend)] text-[13px] font-medium text-neutral-300 transition-colors duration-200 hover:border-[#FFB300]/50 hover:bg-[#FFB300]/15 hover:text-[#FFB300]"
-          >
-            {link.label}
-          </a>
-        ))}
-      </nav>
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3">
+        {/* Profile photo — minimized to a small circle, top-left of the nav. */}
+        <button
+          type="button"
+          onClick={() => setGreetingOpen((open) => !open)}
+          aria-expanded={greetingOpen}
+          aria-controls="mijo-greeting"
+          aria-label="Hi, I'm Mijo — read more below"
+          className={`relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border transition-all duration-200 ${
+            greetingOpen
+              ? "border-[#FFB300]/70 shadow-[0_0_0_1px_rgba(255,179,0,0.30),0_0_18px_rgba(255,179,0,0.25)]"
+              : "border-white/25 hover:border-[#FFB300]/60"
+          }`}
+        >
+          <img
+            src="/Mijo%20Cover.jpg"
+            alt="Mohamed Almajzoub"
+            width={80}
+            height={80}
+            className="size-full rounded-full object-cover"
+          />
+        </button>
+
+        <nav
+          aria-label="Sections"
+          className="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-x-1.5 gap-y-1.5"
+        >
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={() => setGreetingOpen(false)}
+              className="rounded-full border border-transparent px-3 py-1.5 font-[family-name:var(--font-lexend)] text-[13px] font-medium text-neutral-300 transition-colors duration-200 hover:border-[#FFB300]/50 hover:bg-[#FFB300]/15 hover:text-[#FFB300]"
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+
+      {/* Greeting, revealed when the profile photo is pressed. Lives in the
+          header so the fixed bar simply grows a little and nothing overlaps. */}
+      {greetingOpen ? (
+        <div
+          id="mijo-greeting"
+          className="mx-auto w-full max-w-6xl px-4 pb-3"
+        >
+          <div className="relative flex items-center gap-3 rounded-2xl border border-[#FFB300]/25 bg-black/70 px-4 py-3 backdrop-blur-md">
+            <p className="font-[family-name:var(--font-lexend)] text-[14px] leading-relaxed text-neutral-100">
+              {MIJO_GREETING}
+            </p>
+            <button
+              type="button"
+              onClick={() => setGreetingOpen(false)}
+              aria-label="Dismiss message"
+              className="ml-auto flex size-6 shrink-0 items-center justify-center rounded-full text-neutral-400 transition-colors duration-200 hover:bg-white/10 hover:text-[#FFB300]"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      ) : null}
     </header>
   );
 }

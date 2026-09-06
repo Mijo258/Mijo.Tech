@@ -49,12 +49,28 @@ function ProjectBack({ project }: { project: ProjectData }) {
         <p className="font-[family-name:var(--font-lexend)] whitespace-pre-line text-[14px] leading-relaxed text-neutral-300">
           {project.backText}
         </p>
+
+        {project.tech?.length ? (
+          <ul
+            aria-label="Built with"
+            className="mt-5 flex flex-wrap gap-2"
+          >
+            {project.tech.map((item) => (
+              <li
+                key={item}
+                className="rounded-full border border-[#FFB300]/30 bg-[#FFB300]/10 px-3 py-1 font-[family-name:var(--font-lexend)] text-[11.5px] text-[#FFB300]"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
 
       {/* Action sits bottom-right, leaving the bottom-left corner clear for
-          the card's flip control. */}
-      <div className="mt-5 flex shrink-0 justify-end">
-        {project.link ? (
+          the card's flip control. Shown only when a live link exists. */}
+      {project.link ? (
+        <div className="mt-5 flex shrink-0 justify-end">
           <a
             href={project.link}
             target="_blank"
@@ -64,16 +80,8 @@ function ProjectBack({ project }: { project: ProjectData }) {
           >
             {project.buttonText}
           </a>
-        ) : (
-          <button
-            type="button"
-            onClick={(e) => e.stopPropagation()}
-            className="h-10 shrink-0 rounded-md bg-foreground px-5 text-[14px] font-medium text-background"
-          >
-            {project.buttonText}
-          </button>
-        )}
-      </div>
+        </div>
+      ) : null}
     </div>
   );
 }

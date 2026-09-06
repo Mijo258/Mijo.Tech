@@ -36,7 +36,7 @@ export function FlippingCard({
 
   return (
     <div
-      className="relative [perspective:1000px]"
+      className="group relative [perspective:1000px]"
       style={
         {
           "--height": `${height}px`,
@@ -46,7 +46,7 @@ export function FlippingCard({
     >
       <div
         className={cn(
-          "relative rounded-xl border border-neutral-300/80 bg-white/50 shadow-lg shadow-black/40 [transform-style:preserve-3d] transition-transform duration-700 dark:border-white/15 dark:bg-neutral-950/40",
+          "relative rounded-xl border border-neutral-300/80 bg-white/50 shadow-lg shadow-black/40 [transform-style:preserve-3d] transition-all duration-700 group-hover:border-[#FFB300]/70 group-hover:shadow-[0_0_0_1px_rgba(255,179,0,0.35),0_0_30px_rgba(255,179,0,0.22)] dark:border-white/15 dark:bg-neutral-950/40",
           "h-[var(--height)] w-[var(--width)]",
           className
         )}
@@ -57,6 +57,16 @@ export function FlippingCard({
             text on top; raise it (e.g. /70) for less see-through or lower it
             (e.g. /50) for a glassier card. */}
         <div className="absolute inset-0 h-full w-full rounded-[inherit] bg-white/70 text-neutral-950 [backface-visibility:hidden] [transform:rotateY(0deg)] dark:bg-zinc-950/60 dark:text-neutral-50">
+          {/* Interior amber light — glows up from the card's background when the
+              card is hovered/touched, sitting behind the text layer. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 40%, rgba(255,179,0,0.28), rgba(255,179,0,0.09) 46%, transparent 70%)",
+            }}
+          />
           <div className="relative h-full w-full [transform:translateZ(70px)_scale(.93)]">
             {frontContent}
             <FlipToggle flipped={flipped} onToggle={() => setFlipped((f) => !f)} />
@@ -65,6 +75,15 @@ export function FlippingCard({
 
         {/* Back Face */}
         <div className="absolute inset-0 h-full w-full rounded-[inherit] bg-white/70 text-neutral-950 [backface-visibility:hidden] [transform:rotateY(180deg)] dark:bg-zinc-950/60 dark:text-neutral-50">
+          {/* Back face gets the same interior amber glow on hover. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 40%, rgba(255,179,0,0.28), rgba(255,179,0,0.09) 46%, transparent 70%)",
+            }}
+          />
           <div className="relative h-full w-full [transform:translateZ(70px)_scale(.93)]">
             {backContent}
             <FlipToggle flipped={flipped} onToggle={() => setFlipped((f) => !f)} />

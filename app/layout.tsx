@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { Lexend } from "next/font/google";
 import "./globals.css";
 
-// UI face for the site — clean, geometric sans that stays legible for section
-// text and the top navigation.
-const lexend = Lexend({
-  subsets: ["latin"],
-  variable: "--font-lexend",
-  display: "swap",
-});
+// The whole site now renders in Times New Roman (set globally in globals.css),
+// so no webfont is loaded here anymore.
 
 export const metadata: Metadata = {
   title: "Mijo.tech",
@@ -23,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-black">
-      <body className={`${lexend.variable} min-h-svh bg-black text-neutral-50 antialiased`}>
+      <body className="min-h-svh bg-black text-neutral-50 antialiased">
         <main>{children}</main>
       </body>
     </html>

@@ -4,6 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Font utilities across the site still reference this name, but every
+     font now renders as Times New Roman. */
+  --font-lexend: "Times New Roman", Times, serif;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -118,8 +121,10 @@
     @apply bg-background text-foreground;
   }
   /* The top-nav buttons link to page sections; make those jumps glide
-     instead of snapping, and honour users who disable motion. */
+     instead of snapping, and honour users who disable motion. Also set the
+     site-wide face to Times New Roman. */
   html {
+    font-family: "Times New Roman", Times, serif;
     scroll-behavior: smooth;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -195,6 +200,45 @@
 
 @media (prefers-reduced-motion: reduce) {
   .text-gold-shine {
+    animation: none;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Hero role cycler + typewriter caret                                       */
+/* -------------------------------------------------------------------------- */
+/* Each new hero role rises in gently when the cycle advances to it. */
+@keyframes role-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-role-rise {
+  animation: role-rise 0.55s ease both;
+}
+
+/* The typewriter caret blinks while text is being revealed. */
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+.animate-caret {
+  animation: caret-blink 1.1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-role-rise,
+  .animate-caret {
     animation: none;
   }
 }

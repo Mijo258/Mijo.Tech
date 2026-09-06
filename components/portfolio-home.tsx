@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { OrbitalHeroSection } from "@/components/ui/orbital-hero-section";
 import { ProjectCard } from "@/components/ui/project-card";
@@ -28,6 +29,28 @@ const NAV_LINKS = [
   { href: "#experience", label: "Experience & Education" },
   { href: "#contact", label: "Contact" },
 ] as const;
+
+/** The roles under the hero name — each shows in amber-gold, then cycles. */
+const ROLES = [
+  "Full-stack Developer",
+  "AI implementation Engineer",
+  "Advanced Prompt Engineer",
+] as const;
+
+/** The About intro, revealed one character at a time by <Typewriter/>. */
+const ABOUT_TEXT =
+  "Hi, I'm Mohamed Almajzoub. I am a Full-stack Developer and AI Implementation Engineer. I build secure, scalable web applications and engineer self-correcting AI agents that solve complex problems—without hallucination.";
+
+/** A single row in the Experience / Education timeline. */
+type TimelineEntry = {
+  id: string;
+  role: string;
+  place: string;
+  /** Optional; omitted rows render without a date pill. */
+  period?: string;
+  /** Optional, multi-line bullet summary. */
+  note?: string;
+};
 
 export default function PortfolioHome() {
   return (
@@ -83,7 +106,7 @@ function TopNav() {
           <a
             key={link.href}
             href={link.href}
-            className="rounded-full px-3 py-1.5 font-[family-name:var(--font-lexend)] text-[13px] font-medium text-neutral-300 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+            className="rounded-full border border-transparent px-3 py-1.5 font-[family-name:var(--font-lexend)] text-[13px] font-medium text-neutral-300 transition-colors duration-200 hover:border-[#FFB300]/50 hover:bg-[#FFB300]/15 hover:text-[#FFB300]"
           >
             {link.label}
           </a>
@@ -111,12 +134,108 @@ function HeroSection() {
           <span className="block text-gold-shine">Almajzoub</span>
         </h1>
 
-        <p className="mt-6 max-w-xl font-[family-name:var(--font-lexend)] text-[15px] leading-relaxed text-white/75 [text-shadow:0_1px_12px_rgba(0,0,0,0.8)] md:mt-8 md:text-base">
-          I design and build digital experiences that feel good to use.
-          <span className="text-white/45"> [A real one-liner replaces this.]</span>
+        <HeroRoles />
+
+        <p className="mt-4 max-w-xl font-[family-name:var(--font-lexend)] text-[15px] leading-relaxed text-white/80 [text-shadow:0_1px_12px_rgba(0,0,0,0.8)] md:text-base">
+          Build Software solutions that fits every vision.
         </p>
       </div>
     </section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Hero role cycler — the titles under the name                             */
+/* -------------------------------------------------------------------------- */
+
+function HeroRoles() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % ROLES.length), 2800);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div aria-live="polite" className="mt-4 min-h-[2.6rem]">
+      <p
+        key={ROLES[index]}
+        style={{ fontFamily: "'Times New Roman', Times, serif" }}
+        className="animate-role-rise text-2xl font-bold leading-tight [text-shadow:0_1px_14px_rgba(0,0,0,0.6)] md:text-3xl"
+      >
+        {/* Same polished-gold fill as the "Almajzoub" surname. */}
+        <span className="text-gold-shine">{ROLES[index]}</span>
+      </p>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Typewriter — reveals the About intro progressively when it scrolls in    */
+/* -------------------------------------------------------------------------- */
+
+/** True when the visitor prefers reduced motion, which skips the typing. */
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  return reduced;
+}
+
+function Typewriter({ text, className }: { text: string; className?: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const [started, setStarted] = useState(false);
+  const [count, setCount] = useState(0);
+  const done = count >= text.length;
+
+  // Reveal everything at once for reduced-motion users; otherwise wait until
+  // the paragraph scrolls into view before starting to type.
+  useEffect(() => {
+    if (reduced) {
+      setCount(text.length);
+      return;
+    }
+    const node = ref.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setStarted(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, [reduced, text]);
+
+  // Type one character at a time once started.
+  useEffect(() => {
+    if (!started || reduced || done) return;
+    const id = window.setTimeout(() => setCount((c) => c + 1), 20);
+    return () => window.clearTimeout(id);
+  }, [started, reduced, done, count]);
+
+  return (
+    <p ref={ref} aria-label={text} className={className}>
+      <span aria-hidden="true">{text.slice(0, count)}</span>
+      {started && !done ? (
+        <span
+          aria-hidden="true"
+          className="animate-caret ml-0.5 inline-block w-[2px] bg-[#FFB300]"
+          style={{ height: "0.95em", transform: "translateY(0.12em)" }}
+        />
+      ) : null}
+    </p>
   );
 }
 
@@ -165,7 +284,7 @@ function Section({
 /** Muted pill used for placeholder facts and skill chips. */
 function Chip({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-[family-name:var(--font-lexend)] text-[13.5px] text-neutral-300">
+    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-[family-name:var(--font-lexend)] text-[13.5px] text-neutral-300 transition-all duration-300 hover:border-[#FFB300]/70 hover:bg-[#FFB300]/[0.07] hover:text-[#FFB300] hover:shadow-[0_0_0_1px_rgba(255,179,0,0.25),0_0_18px_rgba(255,179,0,0.16)]">
       {children}
     </span>
   );
@@ -176,28 +295,12 @@ function Chip({ children }: { children: ReactNode }) {
 /* -------------------------------------------------------------------------- */
 
 function AboutSection() {
-  const facts = [
-    "[Location]",
-    "[Current role / title]",
-    "[What I focus on]",
-    "[A fun fact]",
-  ];
   return (
-    <Section
-      id="about"
-      step="01 · Who is Mohamed"
-      title="Who is Mohamed"
-      intro="A short introduction — swap these placeholders for the real story."
-    >
-      <div className="space-y-5 font-[family-name:var(--font-lexend)] text-[15px] leading-relaxed text-neutral-300 md:text-base">
-        <p>[Your story in a few sentences: who you are, what you care about, and how you got here.]</p>
-        <p>[A second paragraph on what drives the work — the problems you like solving and why.]</p>
-      </div>
-      <div className="mt-8 flex flex-wrap gap-2.5">
-        {facts.map((fact) => (
-          <Chip key={fact}>{fact}</Chip>
-        ))}
-      </div>
+    <Section id="about" step="01 · Who is Mohamed" title="Who is Mohamed">
+      <Typewriter
+        text={ABOUT_TEXT}
+        className="max-w-2xl font-[family-name:var(--font-lexend)] text-[15px] leading-relaxed text-neutral-300 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)] md:text-base"
+      />
     </Section>
   );
 }
@@ -215,8 +318,12 @@ function ProjectsSection() {
       intro="Finished work, told as flipping cards — use the gold button on each card to turn it."
       wide
     >
-      <div className="grid grid-cols-1 justify-items-center gap-12 lg:grid-cols-2">
-        {[projects.noor, projects["habit-tracker"]].map((project) => (
+      <div className="flex flex-wrap justify-center gap-12">
+        {[
+          projects.noor,
+          projects["habit-tracker"],
+          projects["atbara-trade"],
+        ].map((project) => (
           <div key={project.id} className="dark">
             <ProjectCard project={project} />
           </div>
@@ -232,32 +339,52 @@ function ProjectsSection() {
 
 function InProgressSection() {
   const items = [
-    { title: "[Working title one]", note: "[What it will be, in a line.]" },
-    { title: "[Working title two]", note: "[What it will be, in a line.]" },
-    { title: "[Working title three]", note: "[What it will be, in a line.]" },
+    {
+      title: "Weather Advisor",
+      note: "Live weather, minus the guesswork. Weather Advisor pulls current conditions from the WeatherAPI and turns the raw feed into a clean, readable forecast — a quick glance beats refreshing three different apps. The advisor layer — plain-language summaries and alerts — is the part being built next.",
+    },
+    {
+      title: "Prompt Arena",
+      note: "Prompt Arena turns prompt engineering into a game you actually want to win. Each round drops a challenge — make the model adopt a persona, obey a strict output format, or crack a riddle without being told how — and your prompt is scored by an independent judge model against a hidden rubric. Climb from Apprentice to Prompt Architect through daily challenges and weekly tournaments, then study the winning prompts to see exactly what separated good from great. The judge engine — rubric design and anti-gaming checks — is what's under construction now.",
+    },
+    {
+      title: "Haggle",
+      note: "Haggle is a negotiation sandbox disguised as a game. An AI merchant with a hidden walk-away price, a mood, and a patience meter barters back with you — you pick your opening offer, read their tone, and time your concessions. Too greedy and the deal dies; too soft and you overpay. Every session logs your performance and coaches you on the counter you should have made, turning a five-minute barter into a real lesson in negotiation. The merchant psychology model and the deal-scoring logic are being built right now.",
+    },
   ];
   return (
     <Section
       id="in-progress"
       step="03 · In Progress"
       title="In Progress / Unfinished"
-      intro="Ideas on the bench — replace these cards as things get built."
+      intro="Projects being built right now — interactive first, shippable next."
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {items.map((item) => (
           <div
             key={item.title}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-[#FFB300]/60 hover:shadow-[0_0_0_1px_rgba(255,179,0,0.22),0_0_26px_rgba(255,179,0,0.16)]"
           >
-            <span className="inline-flex items-center rounded-full border border-[#FFB300]/30 bg-[#FFB300]/10 px-3 py-1 font-[family-name:var(--font-lexend)] text-[12px] font-medium text-[#FFB300]">
-              In progress
-            </span>
-            <h3 className="mt-4 font-[family-name:var(--font-lexend)] text-lg font-medium text-neutral-100">
-              {item.title}
-            </h3>
-            <p className="mt-2 font-[family-name:var(--font-lexend)] text-[14px] leading-relaxed text-neutral-400">
-              {item.note}
-            </p>
+            {/* Interior amber light rising from the card's background on hover. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% 12%, rgba(255,179,0,0.20), rgba(255,179,0,0.07) 48%, transparent 72%)",
+              }}
+            />
+            <div className="relative">
+              <span className="inline-flex items-center rounded-full border border-[#FFB300]/30 bg-[#FFB300]/10 px-3 py-1 font-[family-name:var(--font-lexend)] text-[12px] font-medium text-[#FFB300]">
+                In progress
+              </span>
+              <h3 className="mt-4 font-[family-name:var(--font-lexend)] text-lg font-medium text-neutral-100">
+                {item.title}
+              </h3>
+              <p className="mt-2 font-[family-name:var(--font-lexend)] text-[14px] leading-relaxed text-neutral-400">
+                {item.note}
+              </p>
+            </div>
           </div>
         ))}
       </div>
@@ -271,21 +398,68 @@ function InProgressSection() {
 
 function SkillsSection() {
   const groups = [
-    { label: "Frontend", items: ["[Framework / library]", "[Language]", "[Styling approach]"] },
-    { label: "Backend & Data", items: ["[Runtime / language]", "[Database]", "[APIs]"] },
-    { label: "Tools & Practices", items: ["[Version control]", "[Deployment]", "[Testing]"] },
+    {
+      label: "Languages & Frameworks",
+      items: [
+        "Python",
+        "Django",
+        "Django REST Framework",
+        "SQL",
+        "MySQL",
+        "RESTful APIs",
+      ],
+    },
+    {
+      label: "AI & Automation",
+      items: [
+        "Agentic Workflow Design",
+        "Prompt Engineering",
+        "Hallucination Mitigation",
+        "JSON Task Structuring",
+        "Workflow Automation",
+        "Multimodal Vision",
+      ],
+    },
+    {
+      label: "Tools & Deployment",
+      items: [
+        "Git",
+        "GitHub",
+        "GitHub Actions",
+        "Postman",
+        "PythonAnywhere",
+        "Unit Testing",
+        "Web Scraping",
+      ],
+    },
+    {
+      label: "Core Practices",
+      items: [
+        "SDLC",
+        "OOP",
+        "SOLID Principles",
+        "Data Structures & Algorithms",
+        "Software Design Patterns",
+        "SaaS Architecture",
+        "Agile Methodologies",
+      ],
+    },
+    {
+      label: "Languages",
+      items: ["Arabic — Native", "English — Fluent"],
+    },
   ];
   return (
     <Section
       id="skills"
       step="04 · Skills"
       title="Skills"
-      intro="Grouped chips — rename each bracketed item with the real tool."
+      intro="The stack behind the builds — backend engineering, applied AI, and the practices that keep them production-ready."
     >
       <div className="space-y-8">
         {groups.map((group) => (
           <div key={group.label}>
-            <h3 className="font-[family-name:var(--font-lexend)] text-sm font-medium uppercase tracking-wider text-neutral-500">
+            <h3 className="font-[family-name:var(--font-lexend)] text-sm font-medium uppercase tracking-wider text-[#FFB300]/90">
               {group.label}
             </h3>
             <div className="mt-3 flex flex-wrap gap-2.5">
@@ -304,40 +478,113 @@ function SkillsSection() {
 /*  Section 05 — Experience & Education                                       */
 /* -------------------------------------------------------------------------- */
 
+function TimelineEntryList({ entries }: { entries: TimelineEntry[] }) {
+  return (
+    <ol className="relative space-y-9 border-l border-white/10 pl-8">
+      {entries.map((entry) => (
+        <li key={entry.id} className="relative">
+          <span className="absolute -left-[2.35rem] top-1.5 size-3 rounded-full bg-[#FFB300]" />
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h3 className="font-[family-name:var(--font-lexend)] text-lg font-medium text-neutral-100">
+              {entry.role}
+            </h3>
+            {entry.period ? (
+              <span className="font-[family-name:var(--font-lexend)] text-sm text-neutral-500">
+                {entry.period}
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-1 font-[family-name:var(--font-lexend)] text-sm text-[#FFB300]">
+            {entry.place}
+          </p>
+          {entry.note ? (
+            <p className="mt-2 whitespace-pre-line font-[family-name:var(--font-lexend)] text-[14.5px] leading-relaxed text-neutral-400">
+              {entry.note}
+            </p>
+          ) : null}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function ExperienceSection() {
-  const entries = [
-    { id: "exp-1", role: "[Role / title]", place: "[Company · Location]", period: "[Start]–[End]", note: "[What you did and learned — replace.]" },
-    { id: "exp-2", role: "[Role / title]", place: "[Company · Location]", period: "[Start]–[End]", note: "[What you did and learned — replace.]" },
-    { id: "edu-1", role: "[Degree / course]", place: "[Institution]", period: "[Year]–[Year]", note: "[Highlight or honours — replace.]" },
+  const experience: TimelineEntry[] = [
+    {
+      id: "exp-promptbase",
+      role: "Commercial AI Logic Architect",
+      place: "PromptBase · Remote",
+      period: "Mar 2026 – Present",
+      note: "• Ranked in the global top 8,000 prompt engineers (PromptBase #7,935) for technical prompt architecture and diagnostic-tool development.\n• Engineered a Self-Correcting Diagnostic Suite that automates debugging for backend developers.\n• Designed the “Wait-and-Request” agentic protocol — models must validate system context before generating code, cutting runtime errors.\n• Applied multimodal-vision AI to catch UI crashes and map them to backend database repairs.",
+    },
+    {
+      id: "exp-frontend",
+      role: "Front-end Developer",
+      place: "Self-paced career · Independent",
+      note: "• A self-paced, project-driven front-end track: products taken from concept to polished release while building in public.\n• Sibha — a React-based digital Tasbih and Quran experience with a glassmorphism UI, a stateful live counter, light/dark themes, and a REST-backed verse reader and audio player.\n• Momentum — a Next.js + TypeScript habit tracker with a custom scheduling engine (streak logic, missed-day backfill) persisted in Zustand, animated with Framer Motion, crossfading palettes driven by real-time daily status, and shareable PNG progress cards.\n• Comfortable owning the UI layer of full-stack apps — responsive layouts, motion, accessibility, and performance included.",
+    },
+    {
+      id: "exp-marketplace",
+      role: "Backend Developer",
+      place: "P2P Exchange Platform · Independent project",
+      note: "• Built a full-stack marketplace with Python and Django, centered on secure transaction logic.\n• Architected MySQL database schemas and token-based authentication for secure user access.\n• Automated backend event handling with Django Signals and custom middleware.\n• Used AI-assisted rapid prototyping for the front end while keeping 100% backend data integrity.",
+    },
+    {
+      id: "exp-weather",
+      role: "Automated Data & Weather API Tool",
+      place: "Python automation project",
+      note: "• Designed a Python data scraper and integration tool that pulls real-time environmental datasets from WeatherAPI.\n• Automated the extraction, parsing, and console visualization of JSON-formatted external data.",
+    },
+    {
+      id: "exp-ecommerce",
+      role: "E-Commerce API",
+      place: "Backend architecture project",
+      note: "• Built a production-ready e-commerce API focused on backend server architecture and database management.\n• Validated every endpoint in Postman to confirm robust token authentication and data security.",
+    },
   ];
+
+  const education: TimelineEntry[] = [
+    {
+      id: "edu-bsc",
+      role: "B.Sc. in Communication & Electronics Engineering",
+      place: "Alexandria University · Egypt",
+      period: "2022 – 2027 (expected)",
+      note: "A computer-systems engineering degree taken with a software-first focus — backend development, database management, and applied AI are where the curriculum meets the work I ship.",
+    },
+  ];
+
+  const certifications = [
+    "ALX · Backend Web Development (Django REST Framework) — 2025",
+    "IBM · AI Developer Professional Certificate — 4/10 modules (in progress)",
+    "Software Engineering Essentials",
+    "Introduction to Software Engineering",
+  ];
+
   return (
     <Section
       id="experience"
       step="05 · Experience & Education"
       title="Experience & Education"
-      intro="A simple timeline — edit each bracketed entry."
+      intro="Where I've worked, the systems I've built, and the training behind them."
     >
-      <ol className="relative space-y-10 border-l border-white/10 pl-8">
-        {entries.map((entry) => (
-          <li key={entry.id} className="relative">
-            <span className="absolute -left-[2.35rem] top-1.5 size-3 rounded-full bg-[#FFB300]" />
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h3 className="font-[family-name:var(--font-lexend)] text-lg font-medium text-neutral-100">
-                {entry.role}
-              </h3>
-              <span className="font-[family-name:var(--font-lexend)] text-sm text-neutral-500">
-                {entry.period}
-              </span>
-            </div>
-            <p className="mt-1 font-[family-name:var(--font-lexend)] text-sm text-[#FFB300]">
-              {entry.place}
-            </p>
-            <p className="mt-2 font-[family-name:var(--font-lexend)] text-[14.5px] leading-relaxed text-neutral-400">
-              {entry.note}
-            </p>
-          </li>
+      <h3 className="mb-6 font-[family-name:var(--font-lexend)] text-[13px] font-medium uppercase tracking-[0.2em] text-neutral-400">
+        Experience
+      </h3>
+      <TimelineEntryList entries={experience} />
+
+      <h3 className="mb-6 mt-14 font-[family-name:var(--font-lexend)] text-[13px] font-medium uppercase tracking-[0.2em] text-neutral-400">
+        Education
+      </h3>
+      <TimelineEntryList entries={education} />
+
+      <h3 className="mb-4 mt-14 font-[family-name:var(--font-lexend)] text-[13px] font-medium uppercase tracking-[0.2em] text-neutral-400">
+        Certifications
+      </h3>
+      <div className="flex max-w-3xl flex-wrap gap-2.5">
+        {certifications.map((cert) => (
+          <Chip key={cert}>{cert}</Chip>
         ))}
-      </ol>
+      </div>
     </Section>
   );
 }
@@ -348,17 +595,36 @@ function ExperienceSection() {
 
 function ContactSection() {
   const rows = [
-    { label: "Email", value: "[you@example.com]" },
-    { label: "Location", value: "[City, Country]" },
-    { label: "GitHub", value: "[github.com/your-handle]" },
-    { label: "LinkedIn", value: "[linkedin.com/in/your-handle]" },
+    {
+      label: "Email",
+      value: "mijogiddo@gmail.com",
+      href: "mailto:mijogiddo@gmail.com",
+    },
+    {
+      label: "Phone",
+      value: "+20 155 339 5997",
+      href: "tel:+20155335997",
+    },
+    { label: "Location", value: "Alexandria, Egypt" },
+    {
+      label: "GitHub",
+      value: "github.com/Mijo258",
+      href: "https://github.com/Mijo258",
+      external: true,
+    },
+    {
+      label: "LinkedIn",
+      value: "linkedin.com/in/mohamedalmajzoub-osman-56b057284",
+      href: "https://www.linkedin.com/in/mohamedalmajzoub-osman-56b057284",
+      external: true,
+    },
   ];
   return (
     <Section
       id="contact"
       step="06 · Contact"
       title="Contact"
-      intro="Ways to reach me — paste in the real addresses, then make each row a link."
+      intro="Happy to talk projects, roles, or ideas — reach out through any of these."
     >
       <dl className="max-w-xl divide-y divide-white/10 rounded-2xl border border-white/10">
         {rows.map((row) => (
@@ -370,7 +636,19 @@ function ContactSection() {
               {row.label}
             </dt>
             <dd className="font-[family-name:var(--font-lexend)] text-[15px] text-neutral-200">
-              {row.value}
+              {"href" in row && row.href ? (
+                <a
+                  href={row.href}
+                  {...("external" in row && row.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                  className="text-neutral-200 underline-offset-4 transition-colors duration-200 hover:text-[#FFB300] hover:underline"
+                >
+                  {row.value}
+                </a>
+              ) : (
+                row.value
+              )}
             </dd>
           </div>
         ))}

@@ -6,7 +6,7 @@
  * scrollable text area for longer write-ups.
  */
 
-export type ProjectId = "noor" | "habit-tracker";
+export type ProjectId = "noor" | "habit-tracker" | "atbara-trade";
 
 export interface ProjectData {
   id: ProjectId;
@@ -21,6 +21,8 @@ export interface ProjectData {
   backTitle?: string;
   /** Optional link opened by the card's back-face button. */
   link?: string;
+  /** Optional technology list, rendered as chips on the back face. */
+  tech?: string[];
 }
 
 export const projects: Record<ProjectId, ProjectData> = {
@@ -50,5 +52,30 @@ export const projects: Record<ProjectId, ProjectData> = {
       "This Habit Tracker is a masterclass in front-end state management and dynamic UI architecture.\n\nAt its core is a Custom Scheduling Engine capable of calculating complex repeating intervals, backfilling missed days, and maintaining flawless streak logic—all persisted securely in the browser using Zustand.\n\nThe UI features a Living Background that smoothly crossfades its color palette (Green, Amber, Red) based on your real-time daily completion status. Users can dive into glassy, \"page-on-page\" detail sheets to view 12-week heatmaps, generate shareable PNG progress cards, and export their entire database as JSON.\n\nBuilt with Next.js, TypeScript, Tailwind CSS, and Framer Motion, it delivers a premium, app-like experience directly in the browser.",
     buttonText: "View project",
     link: "https://habittracker-six-sand.vercel.app/",
+  },
+  "atbara-trade": {
+    id: "atbara-trade",
+    title: "Atbara Trade",
+    tagline: "Where offers and wishes land on the same board.",
+    imageSrc: "/Atbara%20Trade.jpg",
+    imageAlt: "Atbara Trade storefront preview",
+    frontText:
+      "Most marketplaces only let people sell. Atbara Trade lets both sides post — sellers list what they have, buyers publish what they're hunting for — so an offer and a wish finally land on the same board.\n\nListings carry a live status (available, reserved, sold) so nobody chases a ghost. A single click on Buy This starts a trade, and every profile carries a display name and direct contact details, so deals finish between two people — not in a dead-end form.\n\nThe storefront is sky-blue and glass-clean, with real search and boards that refresh as items move. It looks like a proper shop, built for a small town with a big appetite.\n\nFlip me over — the engineering is the part I'm proudest of.",
+    backTitle: "Under the Hood",
+    backText:
+      "Backend: a Django 5.2 REST API with token authentication via Simple JWT, running on MySQL — the same code locally and on PythonAnywhere. Every credential is read from the environment with python-decouple, so no password ever lives in the source code.\n\nThe interesting part happened mid-build. I gave listings a status field that moves from available to reserved to sold, then designed a whole PurchaseRequest model so buyers could post what they wanted. Because new users get a profile created automatically by a Django signal, I wrote a one-line backfill so older accounts were migrated too — no lost data, no broken pages.\n\nThe API serves paginated, filterable product feeds wired to a debounced search box, plus a custom initiate-trade action on each listing.\n\nFrontend: hand-written HTML, CSS, and JavaScript — no framework. The glassy cards use backdrop-filter with a fallback for older browsers, the animated sky is pure CSS gradients, and the whole design runs on CSS custom properties, media queries, and prefers-reduced-motion.\n\nUI and API ship from the same Django app, so the site is one origin — fast, simple, and versioned in Git from first commit to live release.",
+    tech: [
+      "Django",
+      "Django REST Framework",
+      "Simple JWT",
+      "MySQL",
+      "Vanilla JS",
+      "CSS Glassmorphism",
+      "Python-decouple",
+      "Git / GitHub",
+      "PythonAnywhere",
+    ],
+    buttonText: "View project",
+    link: "https://mohamedalmajzoub.pythonanywhere.com/",
   },
 };

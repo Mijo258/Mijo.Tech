@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Menu } from "lucide-react";
+import { ArrowUpRight, Menu } from "lucide-react";
 import { OrbitalHeroSection } from "@/components/ui/orbital-hero-section";
 import { ProjectCard } from "@/components/ui/project-card";
 import { projects } from "@/components/ui/projects-data";
@@ -30,6 +30,10 @@ const NAV_LINKS = [
   { href: "#experience", label: "Experience & Education" },
   { href: "#contact", label: "Contact" },
 ] as const;
+
+/** External CV on Google Drive — opened by the gold "My CV" button in the nav. */
+const CV_URL =
+  "https://drive.google.com/file/d/1qwjIAYDqjr2HfcXGe1iAe1ePiUoFFgxj/view?usp=drivesdk";
 
 /** Shown when the top-left profile photo is pressed. */
 const MIJO_GREETING =
@@ -174,6 +178,18 @@ function TopNav() {
             ))}
           </nav>
 
+          {/* My CV — the gold action button; external link, opens in a new tab. */}
+          <a
+            href={CV_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setGreetingOpen(false)}
+            className="hidden shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-b from-[#ffc22e] to-[#e8a000] px-4 py-2 font-[family-name:var(--font-lexend)] text-[13px] font-semibold text-black shadow-[0_2px_14px_rgba(255,179,0,0.35)] transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97] md:inline-flex"
+          >
+            My CV
+            <ArrowUpRight size={15} aria-hidden />
+          </a>
+
           {/* Menu button — mobile only. */}
           <button
             type="button"
@@ -261,6 +277,19 @@ function TopNav() {
               </a>
             ))}
           </nav>
+          {/* My CV — gold, full-width, pinned below the drawer's section list. */}
+          <div className="px-4 pt-3">
+            <a
+              href={CV_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#ffc22e] to-[#e8a000] px-4 py-3 font-[family-name:var(--font-lexend)] text-[15px] font-semibold text-black shadow-[0_4px_18px_rgba(255,179,0,0.35)] transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.98]"
+            >
+              My CV
+              <ArrowUpRight size={16} aria-hidden />
+            </a>
+          </div>
         </aside>
       </div>
     </>

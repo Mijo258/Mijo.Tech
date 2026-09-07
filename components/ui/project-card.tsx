@@ -9,11 +9,15 @@ import { type ProjectData } from "@/components/ui/projects-data";
 function ProjectFront({ project }: { project: ProjectData }) {
   return (
     <div className="flex h-full w-full flex-col">
-      {/* Image header */}
+      {/* Image header — a plain <img>: the fixed h-44 header keeps the layout
+          stable (no shift while it loads), and lazy loading keeps these
+          below-the-fold images cheap. */}
       <div className="relative h-44 shrink-0 overflow-hidden">
         <img
           src={project.imageSrc}
           alt={project.imageAlt}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -76,7 +80,7 @@ function ProjectBack({ project }: { project: ProjectData }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex h-10 items-center justify-center rounded-md bg-foreground px-5 text-[14px] font-medium text-background transition-opacity hover:opacity-90"
+            className="inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-b from-[#ffc22e] to-[#e8a000] px-5 text-[14px] font-medium text-black shadow-[0_4px_18px_rgba(255,179,0,0.35)] transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.98]"
           >
             {project.buttonText}
           </a>
@@ -91,7 +95,7 @@ export function ProjectCard({ project }: { project: ProjectData }) {
     <FlippingCard
       frontContent={<ProjectFront project={project} />}
       backContent={<ProjectBack project={project} />}
-      className="h-[min(82svh,600px)] w-[min(92vw,460px)]"
+      className="mx-auto h-[min(82svh,600px)] w-full max-w-[460px]"
     />
   );
 }

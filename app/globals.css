@@ -119,6 +119,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* The fixed orbital canvas must never rubber-band the page on touch. */
+    overscroll-behavior-y: none;
   }
   /* The top-nav buttons link to page sections; make those jumps glide
      instead of snapping, and honour users who disable motion. Also set the
@@ -126,11 +128,58 @@
   html {
     font-family: "Times New Roman", Times, serif;
     scroll-behavior: smooth;
+    /* No sideways scroll on any device, and no grey tap flash in mobile
+       browsers. */
+    overflow-x: clip;
+    -webkit-tap-highlight-color: transparent;
   }
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
     }
+  }
+  /* Gold focus ring for keyboard and touch navigation — matches the accent. */
+  :focus-visible {
+    outline: 2px solid #ffb300;
+    outline-offset: 2px;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Safe-area helpers                                                          */
+/*  Pad past the notch and rounded corners (iPhones, etc.) once viewport-fit  */
+/*  is set to cover in app/layout.tsx.                                        */
+/* -------------------------------------------------------------------------- */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@utility pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+@utility pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Glass panel — the elevated card surface used across the page.             */
+/*  A translucent blur over the orbital animation with a hairline light       */
+/*  border and a soft top highlight, so it reads as glass against black.      */
+/*  The blur is deliberately modest: these panels sit over a canvas that       */
+/*  repaints every frame, and a wide backdrop-filter on several surfaces at    */
+/*  once is the fastest way to jank a phone.                                  */
+/* -------------------------------------------------------------------------- */
+@layer components {
+  .glass-panel {
+    background: rgb(0 0 0 / 0.5);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 8px 30px rgb(0 0 0 / 0.35);
   }
 }
 

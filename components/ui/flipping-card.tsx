@@ -29,28 +29,33 @@ export function FlippingCard({
   className,
   frontContent,
   backContent,
-  height = 300,
-  width = 350,
+  height,
+  width,
 }: FlippingCardProps) {
   const [flipped, setFlipped] = useState(false);
 
   return (
     <div
-      className="group relative [perspective:1000px]"
-      style={
-        {
-          "--height": `${height}px`,
-          "--width": `${width}px`,
-        } as React.CSSProperties
-      }
+      className={cn(
+        "group relative [perspective:1000px]",
+        // Sizing lives on the wrapper. Every face inside is absolutely
+        // positioned, so the wrapper must own the width or the card would
+        // collapse to a thin sliver (nothing in-flow establishes a width).
+        // Callers like ProjectCard pass w-full/max-w/h-* utilities here.
+        className
+      )}
     >
       <div
-        className={cn(
-          "relative rounded-xl border border-neutral-300/80 bg-white/50 shadow-lg shadow-black/40 [transform-style:preserve-3d] transition-all duration-700 group-hover:border-[#FFB300]/70 group-hover:shadow-[0_0_0_1px_rgba(255,179,0,0.35),0_0_30px_rgba(255,179,0,0.22)] dark:border-white/15 dark:bg-neutral-950/40",
-          "h-[var(--height)] w-[var(--width)]",
-          className
-        )}
-        style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
+        className="relative h-full w-full rounded-xl border border-neutral-300/80 bg-white/50 shadow-lg shadow-black/40 [transform-style:preserve-3d] transition-all duration-700 group-hover:border-[#FFB300]/70 group-hover:shadow-[0_0_0_1px_rgba(255,179,0,0.35),0_0_30px_rgba(255,179,0,0.22)] dark:border-white/15 dark:bg-neutral-950/40"
+        style={{
+          // Explicit width/height props win over the base h-full/w-full fill
+          // (inline style beats utilities). When they are omitted the card
+          // simply fills the wrapper, which already carries the className
+          // sizing.
+          width: width !== undefined ? `${width}px` : undefined,
+          height: height !== undefined ? `${height}px` : undefined,
+          transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+        }}
       >
         {/* Front Face — translucent so the animation behind drifts through.
             The /60 opacity keeps the page's bright spots dim enough to read

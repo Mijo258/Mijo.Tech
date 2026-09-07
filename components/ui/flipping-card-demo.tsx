@@ -50,6 +50,7 @@ export default function FlippingCardDemo() {
         <FlippingCard
           key={card.id}
           width={300}
+          height={400}
           frontContent={<GenericCardFront data={card.front} />}
           backContent={<GenericCardBack data={card.back} />}
         />

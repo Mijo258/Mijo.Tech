@@ -1,9 +1,12 @@
 /**
- * Project definitions for the Projects dropdown in the sidebar.
+ * Project definitions for the flipping project cards on the home page.
  *
  * The text lives here so writing each project's story (the next step) is just
  * editing these strings. The card layout gives the front and back plenty of
  * scrollable text area for longer write-ups.
+ *
+ * Cover images are plain public URLs rendered inside a fixed-height header,
+ * so layout stays stable; filenames with spaces are URL-encoded in the path.
  */
 
 export type ProjectId = "noor" | "habit-tracker" | "atbara-trade";

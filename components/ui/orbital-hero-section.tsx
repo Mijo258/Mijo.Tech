@@ -572,7 +572,10 @@ export function OrbitalHeroSection({
       const rect = host!.getBoundingClientRect();
       const w = Math.max(1, rect.width);
       const h = Math.max(1, rect.height);
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Cap the backing store at 2× on big screens, but drop to 1.5× on small
+      // ones: the hot loop repaints the whole canvas every frame, and on a
+      // phone that pixel area is the difference between smooth and stuttery.
+      dpr = Math.min(window.devicePixelRatio || 1, w * h < 600_000 ? 1.5 : 2);
       if (w === width && h === height) return;
       width = w;
       height = h;

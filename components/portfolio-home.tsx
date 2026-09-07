@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { Menu } from "lucide-react";
 import { OrbitalHeroSection } from "@/components/ui/orbital-hero-section";
 import { ProjectCard } from "@/components/ui/project-card";
 import { projects } from "@/components/ui/projects-data";
@@ -101,72 +102,168 @@ function BackgroundCanvas() {
 
 function TopNav() {
   const [greetingOpen, setGreetingOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuCloseRef = useRef<HTMLButtonElement>(null);
+
+  // Close the drawer with Escape, and lock page scroll while it is open.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [menuOpen]);
+
+  // Move focus into the drawer when it opens.
+  useEffect(() => {
+    if (menuOpen) menuCloseRef.current?.focus();
+  }, [menuOpen]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3">
-        {/* Profile photo — minimized to a small circle, top-left of the nav. */}
-        <button
-          type="button"
-          onClick={() => setGreetingOpen((open) => !open)}
-          aria-expanded={greetingOpen}
-          aria-controls="mijo-greeting"
-          aria-label="Hi, I'm Mijo — read more below"
-          className={`relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border transition-all duration-200 ${
-            greetingOpen
-              ? "border-[#FFB300]/70 shadow-[0_0_0_1px_rgba(255,179,0,0.30),0_0_18px_rgba(255,179,0,0.25)]"
-              : "border-white/25 hover:border-[#FFB300]/60"
+    <>
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-md">
+        {/* The calc padding clears the phone notch / landscape corners once
+            viewport-fit covers the whole screen. */}
+        <div className="mx-auto flex w-full max-w-6xl items-center gap-3 pb-3 pl-[calc(env(safe-area-inset-left,0px)+1rem)] pr-[calc(env(safe-area-inset-right,0px)+1rem)] pt-[calc(env(safe-area-inset-top,0px)+0.75rem)]">
+          {/* Profile photo — minimized to a small circle, top-left of the nav. */}
+          <button
+            type="button"
+            onClick={() => {
+              setGreetingOpen((open) => !open);
+              setMenuOpen(false);
+            }}
+            aria-expanded={greetingOpen}
+            aria-controls="mijo-greeting"
+            aria-label="Hi, I'm Mijo — read more below"
+            className={`relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border transition-all duration-200 ${
+              greetingOpen
+                ? "border-[#FFB300]/70 shadow-[0_0_0_1px_rgba(255,179,0,0.30),0_0_18px_rgba(255,179,0,0.25)]"
+                : "border-white/25 hover:border-[#FFB300]/60"
+            }`}
+          >
+            <img
+              src="/Mijo%20Cover.jpg"
+              alt="Mohamed Almajzoub"
+              width={80}
+              height={80}
+              className="size-full rounded-full object-cover"
+            />
+          </button>
+
+          {/* Section links — a pill row on md+ screens; below md the drawer
+              takes over, so this row stays hidden there. */}
+          <nav
+            aria-label="Sections"
+            className="hidden min-w-0 flex-1 flex-wrap items-center justify-center gap-x-1.5 gap-y-1.5 md:flex"
+          >
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setGreetingOpen(false)}
+                className="rounded-full border border-transparent px-3 py-1.5 font-[family-name:var(--font-lexend)] text-[13px] font-medium text-neutral-300 transition-colors duration-200 hover:border-[#FFB300]/50 hover:bg-[#FFB300]/15 hover:text-[#FFB300]"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Menu button — mobile only. */}
+          <button
+            type="button"
+            onClick={() => {
+              setGreetingOpen(false);
+              setMenuOpen((open) => !open);
+            }}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            className="ml-auto flex size-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-[#FFB300] transition-colors duration-200 hover:border-[#FFB300]/50 hover:bg-[#FFB300]/15 md:hidden"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
+
+        {/* Greeting, revealed when the profile photo is pressed. Lives in the
+            header so the fixed bar simply grows a little and nothing overlaps. */}
+        {greetingOpen ? (
+          <div
+            id="mijo-greeting"
+            className="mx-auto w-full max-w-6xl px-4 pb-3"
+          >
+            <div className="relative flex items-center gap-3 rounded-2xl border border-[#FFB300]/25 bg-black/70 px-4 py-3 backdrop-blur-md">
+              <p className="font-[family-name:var(--font-lexend)] text-[14px] leading-relaxed text-neutral-100">
+                {MIJO_GREETING}
+              </p>
+              <button
+                type="button"
+                onClick={() => setGreetingOpen(false)}
+                aria-label="Dismiss message"
+                className="ml-auto flex size-6 shrink-0 items-center justify-center rounded-full text-neutral-400 transition-colors duration-200 hover:bg-white/10 hover:text-[#FFB300]"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </header>
+
+      {/* Mobile drawer — slides in from the right below md and is inert (out of
+          the tab order and pointer events) whenever it is closed. The backdrop
+          sits under the header (z-40 < z-50) so the menu button stays
+          reachable, and the panel slides in beneath the header. */}
+      <div className={`fixed inset-0 z-40 md:hidden`} inert={!menuOpen}>
+        <div
+          onClick={() => setMenuOpen(false)}
+          aria-hidden="true"
+          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 motion-reduce:transition-none ${
+            menuOpen ? "opacity-100" : "opacity-0"
+          }`}
+        />
+        <aside
+          id="mobile-menu"
+          className={`glass-panel absolute right-0 top-0 flex h-dvh w-72 max-w-[80vw] flex-col overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] transition-transform duration-300 ease-out motion-reduce:transition-none ${
+            menuOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          <img
-            src="/Mijo%20Cover.jpg"
-            alt="Mohamed Almajzoub"
-            width={80}
-            height={80}
-            className="size-full rounded-full object-cover"
-          />
-        </button>
-
-        <nav
-          aria-label="Sections"
-          className="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-x-1.5 gap-y-1.5"
-        >
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setGreetingOpen(false)}
-              className="rounded-full border border-transparent px-3 py-1.5 font-[family-name:var(--font-lexend)] text-[13px] font-medium text-neutral-300 transition-colors duration-200 hover:border-[#FFB300]/50 hover:bg-[#FFB300]/15 hover:text-[#FFB300]"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-
-      {/* Greeting, revealed when the profile photo is pressed. Lives in the
-          header so the fixed bar simply grows a little and nothing overlaps. */}
-      {greetingOpen ? (
-        <div
-          id="mijo-greeting"
-          className="mx-auto w-full max-w-6xl px-4 pb-3"
-        >
-          <div className="relative flex items-center gap-3 rounded-2xl border border-[#FFB300]/25 bg-black/70 px-4 py-3 backdrop-blur-md">
-            <p className="font-[family-name:var(--font-lexend)] text-[14px] leading-relaxed text-neutral-100">
-              {MIJO_GREETING}
-            </p>
+          <div className="flex items-center justify-between px-5 pb-2 pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]">
+            <span className="font-[family-name:var(--font-lexend)] text-sm font-semibold uppercase tracking-[0.2em] text-[#FFB300]">
+              Menu
+            </span>
             <button
+              ref={menuCloseRef}
               type="button"
-              onClick={() => setGreetingOpen(false)}
-              aria-label="Dismiss message"
-              className="ml-auto flex size-6 shrink-0 items-center justify-center rounded-full text-neutral-400 transition-colors duration-200 hover:bg-white/10 hover:text-[#FFB300]"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
+              className="flex size-9 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-neutral-300 transition-colors duration-200 hover:border-[#FFB300]/50 hover:text-[#FFB300]"
             >
               ✕
             </button>
           </div>
-        </div>
-      ) : null}
-    </header>
+          <nav aria-label="Sections" className="flex flex-col gap-1 px-4">
+            {NAV_LINKS.map((link, i) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="rounded-xl border border-transparent px-4 py-3 font-[family-name:var(--font-lexend)] text-[15px] font-medium text-neutral-200 transition-colors duration-200 hover:border-[#FFB300]/40 hover:bg-[#FFB300]/10 hover:text-[#FFB300]"
+              >
+                <span className="mr-3 inline-block w-5 text-right text-[#FFB300]/70">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </aside>
+      </div>
+    </>
   );
 }
 
@@ -179,10 +276,12 @@ function HeroSection() {
     <section id="top" className="relative flex min-h-svh items-center px-6 sm:px-10 lg:px-20">
       <div className="max-w-4xl">
         {/* The requested treatment: Times New Roman, bigger than the old
-            script wordmark, with the surname in golden amber. */}
+            script wordmark, with the surname in golden amber. The size is a
+            fluid clamp so the name scales with the viewport and never
+            overflows a narrow phone. */}
         <h1
           style={{ fontFamily: "'Times New Roman', Times, serif" }}
-          className="text-5xl leading-[1.02] text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.6)] sm:text-6xl md:text-7xl lg:text-[6rem] xl:text-[7rem]"
+          className="text-[clamp(2.6rem,8.5vw,7rem)] leading-[1.02] text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.6)]"
         >
           Hi, I&apos;m Mohamed
           <span className="block text-gold-shine">Almajzoub</span>
@@ -215,7 +314,7 @@ function HeroRoles() {
       <p
         key={ROLES[index]}
         style={{ fontFamily: "'Times New Roman', Times, serif" }}
-        className="animate-role-rise text-2xl font-bold leading-tight [text-shadow:0_1px_14px_rgba(0,0,0,0.6)] md:text-3xl"
+        className="animate-role-rise text-[clamp(1.4rem,4.5vw,3rem)] font-bold leading-tight [text-shadow:0_1px_14px_rgba(0,0,0,0.6)]"
       >
         {/* Same polished-gold fill as the "Almajzoub" surname. */}
         <span className="text-gold-shine">{ROLES[index]}</span>
@@ -335,13 +434,19 @@ function Section({
   );
 }
 
-/** Muted pill used for placeholder facts and skill chips. */
-function Chip({ children }: { children: ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-[family-name:var(--font-lexend)] text-[13.5px] text-neutral-300 transition-all duration-300 hover:border-[#FFB300]/70 hover:bg-[#FFB300]/[0.07] hover:text-[#FFB300] hover:shadow-[0_0_0_1px_rgba(255,179,0,0.25),0_0_18px_rgba(255,179,0,0.16)]">
-      {children}
-    </span>
-  );
+/** Muted pill used for placeholder facts and skill chips. With an `href` it
+    becomes a link — used for certificates, which open in a new tab. */
+function Chip({ children, href }: { children: ReactNode; href?: string }) {
+  const classes =
+    "inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-[family-name:var(--font-lexend)] text-[13.5px] text-neutral-300 transition-all duration-300 hover:border-[#FFB300]/70 hover:bg-[#FFB300]/[0.07] hover:text-[#FFB300] hover:shadow-[0_0_0_1px_rgba(255,179,0,0.25),0_0_18px_rgba(255,179,0,0.16)]";
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+        {children}
+      </a>
+    );
+  }
+  return <span className={classes}>{children}</span>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -372,7 +477,10 @@ function ProjectsSection() {
       intro="Finished work, told as flipping cards — use the gold button on each card to turn it."
       wide
     >
-      <div className="flex flex-wrap justify-center gap-12">
+      {/* A tidy 1/2/3 column grid — one card on phones, two on tablets, three
+          on large desktops. Each card centers itself with mx-auto inside its
+          full-width track. */}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 2xl:grid-cols-3">
         {[
           projects.noor,
           projects["habit-tracker"],
@@ -417,7 +525,7 @@ function InProgressSection() {
         {items.map((item) => (
           <div
             key={item.title}
-            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-500 hover:border-[#FFB300]/60 hover:shadow-[0_0_0_1px_rgba(255,179,0,0.22),0_0_26px_rgba(255,179,0,0.16)]"
+            className="glass-panel group relative overflow-hidden rounded-2xl p-6 transition-all duration-500 hover:border-[#FFB300]/60 hover:shadow-[0_0_0_1px_rgba(255,179,0,0.22),0_0_26px_rgba(255,179,0,0.16)]"
           >
             {/* Interior amber light rising from the card's background on hover. */}
             <div
@@ -537,7 +645,13 @@ function TimelineEntryList({ entries }: { entries: TimelineEntry[] }) {
     <ol className="relative space-y-9 border-l border-white/10 pl-8">
       {entries.map((entry) => (
         <li key={entry.id} className="relative">
-          <span className="absolute -left-[2.35rem] top-1.5 size-3 rounded-full bg-[#FFB300]" />
+          {/* The timeline marker — a glossy gold bead with a bright specular
+              highlight and a warm halo, so each entry reads as a glowing
+              point on the line. */}
+          <span
+            aria-hidden
+            className="absolute -left-[2.35rem] top-1.5 size-3 rounded-full bg-[radial-gradient(circle_at_35%_30%,#fff6d8_0%,#ffd35c_45%,#ffb300_70%,#7a4e00_100%)] shadow-[0_0_6px_1px_rgba(255,179,0,0.75),0_0_18px_4px_rgba(255,179,0,0.35)]"
+          />
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h3 className="font-[family-name:var(--font-lexend)] text-lg font-medium text-neutral-100">
               {entry.role}
@@ -607,11 +721,24 @@ function ExperienceSection() {
     },
   ];
 
-  const certifications = [
-    "ALX · Backend Web Development (Django REST Framework) — 2025",
-    "IBM · AI Developer Professional Certificate — 4/10 modules (in progress)",
-    "Software Engineering Essentials",
-    "Introduction to Software Engineering",
+  /** Certification chips; each one links to its certificate folder. */
+  const certifications: { label: string; href: string }[] = [
+    {
+      label: "ALX · Backend Web Development (Django REST Framework) — 2025",
+      href: "https://drive.google.com/drive/folders/1_LeXOiQy0SPfjzB4DLtIJ3A6c8FMjNuk",
+    },
+    {
+      label: "IBM · AI Developer Professional Certificate — 4/10 modules (in progress)",
+      href: "https://drive.google.com/drive/folders/165bBgyOWSYabGTdv6nAWScIK5rUV53Sm",
+    },
+    {
+      label: "Software Engineering Essentials",
+      href: "https://drive.google.com/drive/folders/1_NbGkdaiEUuZzc9YHMwQ4lwwa9D9USTR",
+    },
+    {
+      label: "Google Claude · Gen AI Beyond the Chatbot",
+      href: "https://drive.google.com/drive/folders/1Zvlx2GiR8MbH14358QOJ81FIqLosj2wG",
+    },
   ];
 
   return (
@@ -636,7 +763,9 @@ function ExperienceSection() {
       </h3>
       <div className="flex max-w-3xl flex-wrap gap-2.5">
         {certifications.map((cert) => (
-          <Chip key={cert}>{cert}</Chip>
+          <Chip key={cert.href} href={cert.href}>
+            {cert.label}
+          </Chip>
         ))}
       </div>
     </Section>
@@ -680,7 +809,7 @@ function ContactSection() {
       title="Contact"
       intro="Happy to talk projects, roles, or ideas — reach out through any of these."
     >
-      <dl className="max-w-xl divide-y divide-white/10 rounded-2xl border border-white/10">
+      <dl className="glass-panel max-w-xl divide-y divide-white/10 rounded-2xl">
         {rows.map((row) => (
           <div
             key={row.label}

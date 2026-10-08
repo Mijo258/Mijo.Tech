@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460" width="1200" height="460" role="img" aria-label="Student Billing API — ASP.NET Core 8 REST endpoints">
+  <!--
+    Cover art for the Student Billing API project card.
+    Sized 1200x460 (ratio ~2.61) to match the card header (460px wide, h-44),
+    so object-cover fills it without cropping. The lower ~40% is deliberately
+    left dark: the card lays a black gradient and the project title over it.
+    Palette matches the site: near-black ground, #FFB300 gold accent.
+  -->
+  <defs>
+    <radialGradient id="sba-glow" cx="50%" cy="0%" r="78%">
+      <stop offset="0%" stop-color="#FFB300" stop-opacity="0.20" />
+      <stop offset="55%" stop-color="#FFB300" stop-opacity="0.045" />
+      <stop offset="100%" stop-color="#FFB300" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="sba-spine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFB300" stop-opacity="0" />
+      <stop offset="22%" stop-color="#FFB300" stop-opacity="0.85" />
+      <stop offset="78%" stop-color="#FFB300" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#FFB300" stop-opacity="0" />
+    </linearGradient>
+    <pattern id="sba-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="460" fill="#050506" />
+  <rect width="1200" height="460" fill="url(#sba-grid)" />
+  <rect width="1200" height="460" fill="url(#sba-glow)" />
+
+  <!-- Deployment / spec stamp, top right -->
+  <text x="1150" y="72" text-anchor="end"
+        font-family="Times New Roman, Times, serif" font-size="22" letter-spacing="4.5"
+        fill="#ffffff" fill-opacity="0.32">ASP.NET CORE 8 · OPENAPI 3.0.1</text>
+
+  <!-- Gold spine, echoing the site's timeline accent -->
+  <rect x="52" y="102" width="3" height="152" rx="1.5" fill="url(#sba-spine)" />
+
+  <!-- Endpoint 1 — GET -->
+  <rect x="84" y="112" width="676" height="60" rx="14"
+        fill="#ffffff" fill-opacity="0.035" stroke="#FFB300" stroke-opacity="0.26" />
+  <text x="110" y="150" font-family="Consolas, 'Courier New', monospace" font-size="22"
+        font-weight="bold" fill="#FFB300">GET</text>
+  <text x="178" y="151" font-family="Consolas, 'Courier New', monospace" font-size="26"
+        fill="#e9e9e9" fill-opacity="0.85">/students/{studentNo}/installments</text>
+  <text x="734" y="151" text-anchor="end" font-family="Consolas, 'Courier New', monospace"
+        font-size="22" fill="#FFB300" fill-opacity="0.6">200</text>
+
+  <!-- Endpoint 2 — PUT -->
+  <rect x="84" y="192" width="962" height="60" rx="14"
+        fill="#ffffff" fill-opacity="0.035" stroke="#FFB300" stroke-opacity="0.26" />
+  <text x="110" y="230" font-family="Consolas, 'Courier New', monospace" font-size="22"
+        font-weight="bold" fill="#FFB300">PUT</text>
+  <text x="178" y="231" font-family="Consolas, 'Courier New', monospace" font-size="26"
+        fill="#e9e9e9" fill-opacity="0.85">/students/{studentNo}/installments/{installmentNo}/pay</text>
+  <text x="1020" y="231" text-anchor="end" font-family="Consolas, 'Courier New', monospace"
+        font-size="22" fill="#FFB300" fill-opacity="0.6">200</text>
+</svg>

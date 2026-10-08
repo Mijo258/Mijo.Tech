@@ -506,11 +506,13 @@ function ProjectsSection() {
       intro="Finished work, told as flipping cards — use the gold button on each card to turn it."
       wide
     >
-      {/* A tidy 1/2/3 column grid — one card on phones, two on tablets, three
-          on large desktops. Each card centers itself with mx-auto inside its
-          full-width track. */}
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 2xl:grid-cols-3">
+      {/* A tidy grid — one card on phones, then a 2x2 block from md up. With
+          four cards a third column would leave the last one orphaned on its own
+          row, so two columns keeps the block balanced at every width. Each card
+          centers itself with mx-auto inside its full-width track. */}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         {[
+          projects["student-billing-api"],
           projects.noor,
           projects["habit-tracker"],
           projects["atbara-trade"],
@@ -592,12 +594,22 @@ function SkillsSection() {
     {
       label: "Languages & Frameworks",
       items: [
+        "C#",
+        "ASP.NET Core",
+        ".NET 8",
         "Python",
         "Django",
         "Django REST Framework",
+      ],
+    },
+    {
+      label: "APIs & Data",
+      items: [
+        "RESTful API Design",
+        "OpenAPI / Swagger",
+        "Data Modelling",
         "SQL",
         "MySQL",
-        "RESTful APIs",
       ],
     },
     {
@@ -617,6 +629,7 @@ function SkillsSection() {
         "Git",
         "GitHub",
         "GitHub Actions",
+        "Docker",
         "Postman",
         "PythonAnywhere",
         "Unit Testing",
@@ -629,6 +642,7 @@ function SkillsSection() {
         "SDLC",
         "OOP",
         "SOLID Principles",
+        "Dependency Injection",
         "Data Structures & Algorithms",
         "Software Design Patterns",
         "SaaS Architecture",
@@ -713,6 +727,13 @@ function ExperienceSection() {
       place: "PromptBase · Remote",
       period: "Mar 2026 – Present",
       note: "• Ranked in the global top 8,000 prompt engineers (PromptBase #7,935) for technical prompt architecture and diagnostic-tool development.\n• Engineered a Self-Correcting Diagnostic Suite that automates debugging for backend developers.\n• Designed the “Wait-and-Request” agentic protocol — models must validate system context before generating code, cutting runtime errors.\n• Applied multimodal-vision AI to catch UI crashes and map them to backend database repairs.",
+    },
+    {
+      id: "exp-dotnet-api",
+      role: "Backend Developer",
+      place: "Student Billing API · Independent project",
+      period: "2026",
+      note: "• Designed and shipped a REST billing API in C# on ASP.NET Core 8 — documented with Swagger / OpenAPI and deployed live.\n• Kept HTTP concerns out of the domain: the controller owns routing and status codes only, with every operation behind an injected IStudentBillingService singleton.\n• Built a thread-safe in-memory store — a static list guarded by a lock — so payments written by one request are visible to the next, with no database required.\n• Made payment idempotent: retrying a settled instalment returns 400 and preserves the original paid date rather than rewriting it.\n• Standardised every 400 and 404 on RFC 7807 ProblemDetails, and containerised the service with a multi-stage .NET 8 Dockerfile.",
     },
     {
       id: "exp-frontend",
